@@ -1,0 +1,20 @@
+.env
+crm_data.db
+recordings/
+__pycache__/
+*.pyc
+dist/
+build/
+*.spec
+.venv/
+venv/
+# Local data — never commit
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+.env.*
+
+# One-off scripts run against the live database
+_*.py
+!.env.example
