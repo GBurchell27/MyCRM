@@ -107,7 +107,7 @@ class App(tk.Tk):
                 import ctypes
 
                 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
-                    "CRMnMeetingsNotes.App"
+                    "MyCRM.App"
                 )
             except Exception:
                 pass
