@@ -2,11 +2,18 @@
 
 import json
 import unittest
+from unittest import mock
 
 from support import TempDbTestCase
 
 from catchup_pack import build_pack
 from task_manager import TaskManager
+
+
+def complete_on(task_id, stamp):
+    """Complete a task as if on `stamp`, so the test never depends on today's date."""
+    with mock.patch.object(TaskManager, "now_stamp", return_value=stamp):
+        TaskManager.complete_task(task_id)
 
 
 def agenda(*items):
@@ -53,7 +60,7 @@ class BuildPackTests(TempDbTestCase):
 
     def test_a_task_completed_in_the_window_is_reported_once_not_twice(self):
         task_id = TaskManager.create_task("ProjectAtlas")
-        TaskManager.complete_task(task_id)
+        complete_on(task_id, "2026-08-09 10:00")
         self.add_meeting("2026-08-07", "Morgan", ai_summary="last 1:1",
                          agenda_items=agenda(item("ProjectAtlas", in_tasks=True,
                                                   task_id=task_id)))
@@ -68,7 +75,7 @@ class BuildPackTests(TempDbTestCase):
 
     def test_unrelated_tasks_completed_in_the_window_are_listed_separately(self):
         task_id = TaskManager.create_task("Chase IT for credentials")
-        TaskManager.complete_task(task_id)
+        complete_on(task_id, "2026-08-09 10:00")
         self.add_meeting("2026-08-07", "Morgan", ai_summary="last 1:1")
         target = self.add_meeting("2026-08-11", "Morgan")
 

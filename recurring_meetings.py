@@ -22,7 +22,7 @@ WEEKDAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturd
 
 class RecurringMeetingManager:
     @staticmethod
-    def create(person, weekdays, catchup_enabled=True):
+    def create(person, weekdays, catchup_enabled=True, today=None):
         person = (person or "").strip()
         if not person:
             raise ValueError("Person is required")
@@ -38,7 +38,7 @@ class RecurringMeetingManager:
         conn.commit()
         recurring_id = cursor.lastrowid
         conn.close()
-        RecurringMeetingManager._fill_occurrences(recurring_id, person, weekdays)
+        RecurringMeetingManager._fill_occurrences(recurring_id, person, weekdays, today=today)
         return recurring_id
 
     @staticmethod
