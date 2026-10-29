@@ -18,6 +18,19 @@ CHIP_FG = "#174EA6"
 # Chips are laid out by hand, so their width has to be guessed before they exist.
 PIXELS_PER_CHAR = 7
 CHIP_PADDING_PX = 34
+MAX_SUGGESTIONS_SHOWN = 6
+
+
+def matching_people(known_people, typed):
+    """Known people with a first name or surname starting with what was typed."""
+    prefix = typed.strip().casefold()
+    if not prefix:
+        return []
+    return [
+        name for name in known_people
+        if name.casefold().startswith(prefix)
+        or any(word.startswith(prefix) for word in name.casefold().split())
+    ]
 
 
 class AttendeesField(ttk.Frame):
@@ -28,6 +41,7 @@ class AttendeesField(ttk.Frame):
         self._names = []
         self._wrap_px = wrap_px
         self._on_change = on_change
+        self._known_people = list(known_people)
 
         entry_row = ttk.Frame(self)
         entry_row.pack(fill="x")
@@ -35,9 +49,17 @@ class AttendeesField(ttk.Frame):
         self.combo.pack(side="left")
         self.combo.bind("<Return>", self._add_typed)
         self.combo.bind("<<ComboboxSelected>>", self._add_typed)
+        self.combo.bind("<KeyRelease>", self._refresh_suggestions)
+        self.combo.bind("<Down>", lambda _e: self._move_highlight(1))
+        self.combo.bind("<Up>", lambda _e: self._move_highlight(-1))
+        self.combo.bind("<Escape>", self._hide_suggestions)
         add_btn = ttk.Button(entry_row, text="+ Add", width=7, command=self._add_typed)
         add_btn.pack(side="left", padx=(4, 0))
         self.add_button = add_btn
+
+        # Names matching what is typed, so nobody has to scroll the whole list.
+        self._suggestions = tk.Listbox(self, height=1, activestyle="none", exportselection=False)
+        self._suggestions.bind("<ButtonRelease-1>", self._add_highlighted)
 
         self._chips = ttk.Frame(self)
 
@@ -79,7 +101,8 @@ class AttendeesField(ttk.Frame):
         self._redraw()
 
     def set_known_people(self, people):
-        self.combo.configure(values=list(people))
+        self._known_people = list(people)
+        self.combo.configure(values=self._known_people)
 
     def focus_set(self):
         self.combo.focus_set()
@@ -87,13 +110,47 @@ class AttendeesField(ttk.Frame):
     # --------------------------------------------------------------- internals
 
     def _add_typed(self, _event=None):
-        typed = self.combo.get().strip()
+        highlighted = self._suggestions.curselection()
+        typed = self._suggestions.get(highlighted[0]) if highlighted else self.combo.get().strip()
+        self._hide_suggestions()
         if not typed:
             return "break"
         self.add(typed)
         self.combo.set("")
         self.combo.focus_set()
         return "break"
+
+    def _add_highlighted(self, _event=None):
+        if self._suggestions.curselection():
+            self._add_typed()
+
+    def _refresh_suggestions(self, event):
+        if event.keysym in ("Down", "Up", "Return", "Escape", "Tab"):
+            return
+        matches = matching_people(self._known_people, self.combo.get())
+        self._suggestions.delete(0, "end")
+        if not matches:
+            self._suggestions.pack_forget()
+            return
+        self._suggestions.insert("end", *matches)
+        self._suggestions.configure(height=min(len(matches), MAX_SUGGESTIONS_SHOWN))
+        self._suggestions.pack(fill="x", pady=(2, 0), before=self._chips if self._names else None)
+
+    def _move_highlight(self, step):
+        """Arrow keys walk the suggestions while the cursor stays in the box."""
+        count = self._suggestions.size()
+        if not self._suggestions.winfo_ismapped() or not count:
+            return None  # no suggestions: let the combobox open its full list
+        current = self._suggestions.curselection()
+        index = max(0, min(count - 1, current[0] + step if current else 0))
+        self._suggestions.selection_clear(0, "end")
+        self._suggestions.selection_set(index)
+        self._suggestions.see(index)
+        return "break"
+
+    def _hide_suggestions(self, _event=None):
+        self._suggestions.selection_clear(0, "end")
+        self._suggestions.pack_forget()
 
     def _redraw(self):
         for child in self._chips.winfo_children():

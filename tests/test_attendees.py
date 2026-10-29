@@ -62,5 +62,14 @@ class FormattingTests(unittest.TestCase):
         self.assertEqual(attendees.describe("Pat; Erin; Sam"), "Pat, Erin and Sam")
 
 
+class MatchingPeopleTests(unittest.TestCase):
+    def test_typing_finds_first_names_and_surnames(self):
+        from widgets.attendees_field import matching_people
+        known = ["Sigrid Olsen", "Pat Quinn", "Sam Stone", "Erin"]
+        self.assertEqual(matching_people(known, "s"), ["Sigrid Olsen", "Sam Stone"])
+        self.assertEqual(matching_people(known, "qu"), ["Pat Quinn"])
+        self.assertEqual(matching_people(known, "  "), [])
+
+
 if __name__ == "__main__":
     unittest.main()
