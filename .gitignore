@@ -18,3 +18,9 @@ venv/
 # One-off scripts run against the live database
 _*.py
 !.env.example
+
+# Local database backups
+*.db.bak*
+
+# Output written by the one-off scripts above (e.g. meeting transcript dumps)
+_*.txt
