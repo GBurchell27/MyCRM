@@ -9,9 +9,18 @@ from paths import APP_DIR
 DB_PATH = os.path.join(APP_DIR, "crm_data.db")
 
 
+def decode_stored_text(raw_bytes):
+    """Decode a TEXT value, recovering legacy Windows-1252 bytes instead of crashing."""
+    try:
+        return raw_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        return raw_bytes.decode("cp1252", errors="replace")
+
+
 def get_conn():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
+    conn.text_factory = decode_stored_text
     return conn
 
 
