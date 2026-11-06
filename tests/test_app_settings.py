@@ -19,6 +19,8 @@ from config.app_settings import (
     CATCHUP_MEETING_CHARS,
     DICTATION_MAX_MINUTES,
     HOVER_PREVIEWS,
+    RECORD_INCLUDE_SYSTEM_AUDIO,
+    RECORD_INCLUDE_VIDEO,
     RECURRING_HORIZON_DAYS,
     STARTUP_TAB,
     TAB_TASKS,
@@ -35,6 +37,12 @@ class SettingCoercionTests(TempDbTestCase):
     def test_saved_value_round_trips(self):
         CATCHUP_LOOKBACK_DAYS.save(30)
         self.assertEqual(CATCHUP_LOOKBACK_DAYS.get(), 30)
+
+    def test_meeting_recording_defaults_to_audio_and_honors_video_opt_in(self):
+        self.assertFalse(RECORD_INCLUDE_VIDEO.get())
+        self.assertTrue(RECORD_INCLUDE_SYSTEM_AUDIO.get())
+        RECORD_INCLUDE_VIDEO.save(True)
+        self.assertTrue(RECORD_INCLUDE_VIDEO.get())
 
     def test_bool_round_trips_both_ways(self):
         HOVER_PREVIEWS.save(False)

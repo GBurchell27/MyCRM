@@ -112,7 +112,7 @@ class MeetingRecorder:
 
     # ------------------------------------------------------------------ start
 
-    def start(self, include_video=True, include_system_audio=True, note_title=""):
+    def start(self, include_video=False, include_system_audio=True, note_title=""):
         if self._recording:
             return
         self._check_dependencies(include_video)

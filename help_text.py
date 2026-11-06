@@ -32,7 +32,8 @@ RETRY_TRANSCRIPTION = (
     "the part it happened in, and the audio stays on disk to try again."
 )
 INCLUDE_VIDEO = (
-    "Also record your screen. The audio is folded into the video for playback and also "
+    "Also record your screen. Leave this off for lighter audio-only recording. "
+    "The audio is folded into the video for playback and also "
     "kept as a separate file, so the recording never depends on the video surviving."
 )
 RECOVER_RECORDING = (

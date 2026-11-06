@@ -162,7 +162,7 @@ class ScreenVideoRecorder:
         import cv2
         import numpy as np
 
-        shot = np.array(sct.grab(monitor))
+        shot = np.asarray(sct.grab(monitor))
         return self._scale(cv2.cvtColor(shot, cv2.COLOR_BGRA2BGR))
 
     def _open_encoder(self, frame):

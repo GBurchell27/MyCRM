@@ -71,7 +71,7 @@ class H264FfmpegEncoder(FrameEncoder):
             stdin=subprocess.PIPE,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
-            creationflags=CREATE_NO_WINDOW,
+            creationflags=CREATE_NO_WINDOW | subprocess.BELOW_NORMAL_PRIORITY_CLASS,
         )
 
     @property
@@ -107,7 +107,7 @@ class H264FfmpegEncoder(FrameEncoder):
 
         if self._process is None:
             raise RuntimeError("The video encoder has already been closed.")
-        self._process.stdin.write(np.ascontiguousarray(frame).tobytes())
+        self._process.stdin.write(memoryview(np.ascontiguousarray(frame)))
 
     def close(self):
         if self._process is None:

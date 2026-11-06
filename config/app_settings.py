@@ -110,8 +110,8 @@ RECURRING_HORIZON_DAYS = IntSetting(
 RECORD_INCLUDE_VIDEO = BoolSetting(
     key="record_include_video",
     label="Include screen video by default",
-    default=True,
-    help_text="How the “Include screen video” box starts in a new meeting note.",
+    default=False,
+    help_text="Leave off for lighter audio-only capture. You can still enable video in a meeting note.",
 )
 
 RECORD_INCLUDE_SYSTEM_AUDIO = BoolSetting(

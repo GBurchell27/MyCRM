@@ -104,7 +104,7 @@ class MeetingDialog(tk.Toplevel):
             (self.people_field.add_button, help_text.MEETING_PEOPLE_ADD),
         ])
         self.status_var = tk.StringVar(
-            value="Records mic + screen + active windows. Stop/start again to add more clips to this meeting."
+            value="Records audio and active window titles. Enable screen video to capture a demo."
         )
         ttk.Label(tools, textvariable=self.status_var, wraplength=900).pack(anchor="w", pady=(6, 0))
         self.recording.build_indicator(tools)
